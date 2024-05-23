@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import {LessonPlanContext} from './LessonPlanContext';
 
 const Cale = () => {
   const [calendarView, setCalendarView] = useState('dayGridMonth'); // 
+
+  const { lessons } = useContext(LessonPlanContext);
+
+  // const lessonPlanCtx = useContext(LessonPlanContext);
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -33,6 +38,7 @@ const Cale = () => {
         }}
         nowIndicator
         initialDate={getCurrentDate()} // Ensure the calendar opens to the current date
+        events={lessons}
         height="auto"
       />
     </div>

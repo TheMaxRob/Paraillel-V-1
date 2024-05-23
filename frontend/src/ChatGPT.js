@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import Calendar from "react-calendar";
 import "./Calendar.css";
+import {LessonPlanContext} from "./LessonPlanContext";
 
   const ChatGPT = ({ setCurrentPage }) => {
 
@@ -16,6 +17,7 @@ import "./Calendar.css";
   const [theme, setTheme] = useState(""); // Added for theme
   const [experienceLevel, setExperienceLevel] = useState(""); // Added for experience level
   const [date, setDate] = useState(new Date());
+  const { addLessonToCale } = useContext(LessonPlanContext);
 
   const teachingStyles = [
     "Regular School Based",
@@ -96,6 +98,11 @@ import "./Calendar.css";
         const newWindow = window.open("", "_blank");
         newWindow.document.write(`<pre>${responseContent}</pre>`);
         newWindow.document.title = "Lesson Plan Response";
+
+        addLessonToCale({
+          title: lessonTitle,
+          date: startDate,
+        });
       } else {
         console.error(
           "No response or unexpected format received from the server."
@@ -104,6 +111,9 @@ import "./Calendar.css";
     } catch (error) {
       console.error("Error calling backend:", error);
     }
+
+
+    
   };
 
   return (
@@ -152,8 +162,8 @@ import "./Calendar.css";
                 value={teachingStyle}
                 onChange={(e) => setTeachingStyle(e.target.value)}
               >
-                {teachingStyles.map((style) => (
-                  <option key={style} value={style}>
+                {teachingStyles.map((style, index) => (
+                  <option key={index} value={style}>
                     {style}
                   </option>
                 ))}
