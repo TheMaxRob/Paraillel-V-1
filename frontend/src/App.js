@@ -3,10 +3,33 @@ import './App.css';
 import ChatGPT from './ChatGPT';
 import Cale from './Cale';
 import LessonPlanContextProvider from './LessonPlanContext';
+import TheSettings from './TheSettings';
+import Login from './Login';
+import LoginSuccess from './LoginSuccess';
+import Home from './Home';
 
 function App() {
   // State to determine which component to render
-  const [currentPage, setCurrentPage] = useState('chat');
+  const [currentPage, setCurrentPage] = useState('login');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showHome, setShowHome] = useState(false); 
+
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setCurrentPage('LoginSuccess');
+  };
+
+  const handleNavigation = (page) => {
+    setCurrentPage(page, () => {
+      window.scrollTo(0, 0);
+    });
+  };
+
+  const handleSubmit = () => {
+    setCurrentPage('home');
+    setShowHome(true); 
+  };
 
   // Function to render the appropriate component based on state
   const renderPage = () => {

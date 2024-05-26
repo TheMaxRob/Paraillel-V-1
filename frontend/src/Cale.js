@@ -25,8 +25,9 @@ const Cale = () => {
 
   return (
     <div>
+      <div style={{ paddingTop: 0 }}> 
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        
+      </div>
       </div>
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin]}
