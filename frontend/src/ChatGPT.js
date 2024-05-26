@@ -69,7 +69,6 @@ import {LessonPlanContext} from "./LessonPlanContext";
     "Fading",
     "Task Variation",
     "Time Delay",
-    "Incidental Teaching",
     "Pivotal Response Training",
     "Error Correction",
     "Self-Monitoring",

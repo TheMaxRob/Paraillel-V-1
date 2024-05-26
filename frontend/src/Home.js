@@ -17,7 +17,7 @@ function Home({ setCurrentPage }) {
       setCurrentPage("home"); 
     } else if (topic === "Calendar") {
       setCurrentPage("cale"); 
-    }else if (topic === "Settings") {
+    } else if (topic === "Settings") {
       setCurrentPage("TheSettings"); 
     } else {
       setCurrentPage(topicComponents[topic]);

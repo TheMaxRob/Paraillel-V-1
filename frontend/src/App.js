@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import ChatGPT from './ChatGPT';
 import Cale from './Cale';
@@ -14,6 +14,10 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showHome, setShowHome] = useState(false); 
 
+  // Scroll to top of page whenever a new page renders
+   useEffect(() => {
+    window.scrollTo(0, 0);
+   }, [currentPage])
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -21,9 +25,8 @@ function App() {
   };
 
   const handleNavigation = (page) => {
-    setCurrentPage(page, () => {
-      window.scrollTo(0, 0);
-    });
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
   };
 
   const handleSubmit = () => {
@@ -34,22 +37,23 @@ function App() {
   // Function to render the appropriate component based on state
   const renderPage = () => {
     switch (currentPage) {
-      case 'chat':
-        return <ChatGPT />;
-      case 'cale':
-        return <Cale />;
-      case 'TheSettings':
-        return <TheSettings />;
-      case 'home':
-        return <Home setCurrentPage={handleNavigation} />;
-      case 'login':
-        return <Login onLogin={handleLogin} />;
-      case 'LoginSuccess':
-        return <LoginSuccess onSubmit={handleSubmit} />;
-      default:
-        return <div>Page not found</div>;
+        case 'chat':
+            return <ChatGPT setCurrentPage={handleNavigation} />;
+        case 'cale':
+            return <Cale setCurrentPage={handleNavigation} />;
+        case 'TheSettings':
+            return <TheSettings setCurrentPage={handleNavigation} />;
+        case 'home':
+            return <Home setCurrentPage={handleNavigation} />;
+        case 'login':
+            return <Login onLogin={handleLogin} />;
+        case 'LoginSuccess':
+            return <LoginSuccess onSubmit={handleSubmit} />;
+        default:
+            return <div>Page not found</div>;
     }
-  };
+};
+
 
   return (
     <LessonPlanContextProvider>
