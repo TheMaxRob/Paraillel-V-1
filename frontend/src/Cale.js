@@ -9,8 +9,6 @@ const Cale = () => {
 
   const { lessons } = useContext(LessonPlanContext);
 
-  // const lessonPlanCtx = useContext(LessonPlanContext);
-
   const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -24,11 +22,10 @@ const Cale = () => {
   };
 
   return (
-    <div>
-      <div style={{ paddingTop: 0 }}> 
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-      </div>
-      </div>
+    <div style={{ paddingTop: 0 }}> 
+    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+    </div>
+    <div style={{ maxWidth: '800px', margin: '0 auto' , padding: "80px"}}>
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin]}
         initialView={calendarView}
@@ -38,11 +35,12 @@ const Cale = () => {
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         }}
         nowIndicator
-        initialDate={getCurrentDate()} // Ensure the calendar opens to the current date
         events={lessons}
+        initialDate={getCurrentDate()}
         height="auto"
       />
     </div>
+  </div>
   );
 };
 

@@ -3,18 +3,22 @@ import React, { useState } from 'react';
 
 function Login({ onLogin }) {
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [isCreatingProfile, setIsCreatingProfile] = useState(false);
   
-  const toggleMode = () => {
+  const toggleAccountMode = () => {
     setIsCreatingAccount(!isCreatingAccount);
   };
 
+  const toggleProfileMode = () => {
+    setIsCreatingProfile(!isCreatingProfile);
+  }
+
   return (
     <div className="login-container">
-      {isCreatingAccount ? (
-        <CreateAccountForm onLogin={onLogin} toggleMode={toggleMode} />
-      ) : (
-        <LoginForm onLogin={onLogin} toggleMode={toggleMode} />
-      )}
+      {isCreatingAccount && <CreateAccountForm onLogin={onLogin} toggleMode={toggleAccountMode} /> }
+      {isCreatingProfile && <CreateProfileForm onLogin={onLogin} toggleMode={toggleProfileMode} /> }
+      <LoginForm onLogin={onLogin} toggleMode={toggleMode} />
+      
     </div>
   );
 }
@@ -52,7 +56,7 @@ function LoginForm({ onLogin, toggleMode }) {
     e.preventDefault();
 
 
-    const isValidCredentials = await validateLoginCredentials(username, password);
+    const isValidCredentials = true //await validateLoginCredentials(username, password);
     console.log("isValidCredentials: " + isValidCredentials);
       if (username && password && isValidCredentials) {
         onLogin(true);
@@ -104,7 +108,7 @@ function LoginForm({ onLogin, toggleMode }) {
 
 }
 
-function CreateAccountForm({ onLogin, toggleMode }) {
+function CreateAccountForm({ onLogin, toggleAccountMode }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -167,10 +171,12 @@ function CreateAccountForm({ onLogin, toggleMode }) {
         // If login is unsuccessful, show error message
         if (data && data.message) {
             alert(data.message);
+            onLogin(true);
         }
     })
     .catch(error => {
         console.error('Error:', error);
+        onLogin(true);
     });
   }
 
@@ -227,7 +233,8 @@ function CreateAccountForm({ onLogin, toggleMode }) {
     }
     console.log('Creating account...');
     onLogin(true); 
-    toggleMode(); 
+    toggleAccountMode(); 
+    toggleProfileMode();
   };
 
   return (
@@ -276,6 +283,113 @@ function CreateAccountForm({ onLogin, toggleMode }) {
       <button type="button" onClick={toggleMode}>
         Already have an account? Login
       </button>
+    </form>
+  );
+}
+
+function CreateProfileForm({ onLogin, toggleProfileMode }) {
+  const [ schoolId, setSchoolId ] = useState('');
+  const [ districtId, setDistrictId ] = useState('');
+  const [ address, setAddress ] = useState('');
+  const [ phoneNumber, setPhoneNumber ] = useState('');
+  const [ name, setName ] = useState('');
+
+
+  function createProfile() {
+    const name = document.getElementById('name').value;
+    const districtId = document.getElementById('districtId').value;
+    const schoolId = document.getElementById('schoolId').value;
+    const address = document.getElementById('address').value;
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    // Make a POST request to your Flask backend
+    console.log("createProfile function called!");
+    fetch('http://localhost:5000/create-account', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            email: email
+        })
+    })
+    .then(response => {
+      console.log('Response status:', response.status);
+        if (response.ok) {
+          onLogin(true);
+          //console.log("isValidCredentials: " + isValidCredentials);
+            //window.location.href = '/home';
+        } else {
+            return response.json();
+        }
+    })
+    .then(data => {
+        // If login is unsuccessful, show error message
+        if (data && data.message) {
+            alert(data.message);
+            onLogin(true);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        onLogin(true);
+    });
+  }
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name || !email || !address || ! districtId || !schoolId) {
+      alert('Please fill all fields correctly for profile creation.');
+      return;
+    }
+    console.log('Creating Profile...')
+    createProfile();
+    onLogin(true); 
+    toggleProfileMode();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='login-form'>
+      <h2>Profile Information</h2>
+      <div>
+        <label htmlFor='name'>School ID</label>
+          <input
+            type="text"
+            id='name'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        <label htmlFor='schoolId'>School ID</label>
+          <input
+            type="text"
+            id='schoolId'
+            value={schoolId}
+            onChange={(e) => setSchoolId(e.target.value)}
+          />
+          <label htmlFor='districtId'>School ID</label>
+          <input
+            type="text"
+            id='districtId'
+            value={districtId}
+            onChange={(e) => setDistrictId(e.target.value)}
+          />
+          <label htmlFor='address'>School ID</label>
+          <input
+            type="text"
+            id='address'
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+          <label htmlFor='phoneNumber'>School ID</label>
+          <input
+            type="text"
+            id='phoneNumber'
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          
+      </div>
     </form>
   );
 }
