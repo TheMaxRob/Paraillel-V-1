@@ -68,6 +68,7 @@ def login():
 
 @app.route('/create-account', methods=['POST'])
 def create_account():
+    return jsonify({'success': True}), 200
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -92,6 +93,21 @@ def create_account():
     return redirect(url_for('home'))
     #return render_template('http://localhost:3000/')
 
+@app.route('/create-profile', methods=['POST'])
+def create_profile():
+    data = request.get_json()
+    username = data.get('localUsername')
+    password = data.get('localPassword')
+    name = data.get('name')
+    districtId = data.get('districtId')
+    schoolId = data.get('schoolId')
+    address = data.get('address')
+    phoneNumber = data.get('phoneNumber')
+   
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO Users ( username,)")
 
 '''@app.route('/login', methods = ['POST','GET'])
 def login():   

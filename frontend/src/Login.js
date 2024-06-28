@@ -2,30 +2,50 @@ import './Login.css';
 import React, { useState } from 'react';
 
 function Login({ onLogin }) {
-  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
-  const [isCreatingProfile, setIsCreatingProfile] = useState(false);
+  const [ isCreatingAccount, setIsCreatingAccount ] = useState(false);
+  const [ isCreatingProfile, setIsCreatingProfile ] = useState(false);
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   
   const toggleAccountMode = () => {
     setIsCreatingAccount(!isCreatingAccount);
+    if (isCreatingProfile) {
+      setIsCreatingProfile(false);
+    }
   };
 
   const toggleProfileMode = () => {
     setIsCreatingProfile(!isCreatingProfile);
-  }
-
+    if (isCreatingAccount) {
+      setIsCreatingAccount(false);
+    }
+  };
   return (
     <div className="login-container">
-      {isCreatingAccount && <CreateAccountForm onLogin={onLogin} toggleMode={toggleAccountMode} /> }
-      {isCreatingProfile && <CreateProfileForm onLogin={onLogin} toggleMode={toggleProfileMode} /> }
-      <LoginForm onLogin={onLogin} toggleMode={toggleMode} />
-      
+      {isCreatingAccount && <CreateAccountForm 
+          onLogin={onLogin} 
+          toggleAccountMode={toggleAccountMode} 
+          toggleProfileMode={toggleProfileMode} 
+          setUsername={setUsername}  
+        /> }
+      {isCreatingProfile && <CreateProfileForm 
+        onLogin={onLogin} 
+        toggleMode={toggleProfileMode} 
+        username={username}
+        password={password}
+        /> }
+      {!isCreatingAccount && !isCreatingProfile && (
+        <LoginForm onLogin={onLogin} toggleMode={toggleAccountMode} />
+      )}
     </div>
   );
 }
 
 function LoginForm({ onLogin, toggleMode }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  
+  const [ localUsername, setLocalUsername ] = useState('');
+  const [ localPassword, setLocalPassword ] = useState('');
 
   const validateLoginCredentials = async (username, password) => {
     try {
@@ -55,10 +75,9 @@ function LoginForm({ onLogin, toggleMode }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     const isValidCredentials = true //await validateLoginCredentials(username, password);
     console.log("isValidCredentials: " + isValidCredentials);
-      if (username && password && isValidCredentials) {
+      if (localUsername && localPassword && isValidCredentials) {
         onLogin(true);
         console.log("isValidCredentials: " + isValidCredentials);
         //window.location.href = '/home'; 
@@ -85,18 +104,18 @@ function LoginForm({ onLogin, toggleMode }) {
         <label htmlFor='username'>Username</label>
         <input
           type="text"
-          id='username'
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          id='localUsername'
+          value={localUsername}
+          onChange={(e) => setLocalUsername(e.target.value)}
         />
       </div>
       <div>
         <label htmlFor='password'>Password</label>
         <input
           type="password"
-          id='password'
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          id='localPassword'
+          value={localPassword}
+          onChange={(e) => setLocalPassword(e.target.value)}
         />
       </div>
       <button type="submit">Login</button>
@@ -108,10 +127,10 @@ function LoginForm({ onLogin, toggleMode }) {
 
 }
 
-function CreateAccountForm({ onLogin, toggleAccountMode }) {
-  const [username, setUsername] = useState('');
+function CreateAccountForm({ onLogin, toggleAccountMode, toggleProfileMode, setUsername }) {
+  const [localUsername, setLocalUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [localPassword, setLocalPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -122,12 +141,12 @@ function CreateAccountForm({ onLogin, toggleAccountMode }) {
     setEmailError('');
     setPasswordError('');
     let noError = true;
-    if (username.length < 3) {
+    if (localUsername.length < 3) {
       setUsernameError("Username must be 3 characters or longer.");
       console.log("Username Error!")
       noError = false;
     }
-    if (password.length < 8) {
+    if (localPassword.length < 8) {
       setPasswordError("Password must be 8 characters or longer.");
       console.log("Password Error!")
       noError = false;
@@ -152,15 +171,15 @@ function CreateAccountForm({ onLogin, toggleAccountMode }) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            username: username,
-            password: password,
-            email: email
+            username: localUsername,
+            password,
+            email
         })
     })
     .then(response => {
       console.log('Response status:', response.status);
         if (response.ok) {
-          onLogin(true);
+          setUsername(localUsername);
           //console.log("isValidCredentials: " + isValidCredentials);
             //window.location.href = '/home';
         } else {
@@ -220,7 +239,7 @@ function CreateAccountForm({ onLogin, toggleAccountMode }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!username || !email || !password || password !== confirmPassword) {
+    if (!localUsername || !email || !localPassword || localPassword !== confirmPassword) {
       alert('Please fill all fields correctly for account creation.');
       return;
     }
@@ -232,7 +251,6 @@ function CreateAccountForm({ onLogin, toggleAccountMode }) {
       return;
     }
     console.log('Creating account...');
-    onLogin(true); 
     toggleAccountMode(); 
     toggleProfileMode();
   };
@@ -245,8 +263,8 @@ function CreateAccountForm({ onLogin, toggleAccountMode }) {
         <input
           type="text"
           id='username'
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={localUsername}
+          onChange={(e) => setLocalUsername(e.target.value)}
         />
         <span className='credentials-error'>{usernameError}</span>
       </div>
@@ -265,8 +283,8 @@ function CreateAccountForm({ onLogin, toggleAccountMode }) {
         <input
           type="password"
           id='password'
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={localPassword}
+          onChange={(e) => setLocalPassword(e.target.value)}
         />
          <span className='credentials-error'>{passwordError}</span>
       </div>
@@ -280,14 +298,14 @@ function CreateAccountForm({ onLogin, toggleAccountMode }) {
         />
       </div>
       <button type="submit" onClick={handleSubmit}> Create Account</button>
-      <button type="button" onClick={toggleMode}>
+      <button type="button" onClick={toggleAccountMode}>
         Already have an account? Login
       </button>
     </form>
   );
 }
 
-function CreateProfileForm({ onLogin, toggleProfileMode }) {
+function CreateProfileForm({ onLogin, toggleProfileMode, username, password }) {
   const [ schoolId, setSchoolId ] = useState('');
   const [ districtId, setDistrictId ] = useState('');
   const [ address, setAddress ] = useState('');
@@ -303,15 +321,19 @@ function CreateProfileForm({ onLogin, toggleProfileMode }) {
     const phoneNumber = document.getElementById('phoneNumber').value;
     // Make a POST request to your Flask backend
     console.log("createProfile function called!");
-    fetch('http://localhost:5000/create-account', {
+    fetch('http://localhost:5000/create-profile', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            username: username,
-            password: password,
-            email: email
+            username,
+            password,
+            name,
+            districtId,
+            schoolId,
+            address,
+            phoneNumber
         })
     })
     .then(response => {
@@ -339,21 +361,20 @@ function CreateProfileForm({ onLogin, toggleProfileMode }) {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !email || !address || ! districtId || !schoolId) {
+    if (!name || !address || ! districtId || !schoolId || !phoneNumber) {
       alert('Please fill all fields correctly for profile creation.');
       return;
     }
     console.log('Creating Profile...')
     createProfile();
     onLogin(true); 
-    toggleProfileMode();
   };
 
   return (
     <form onSubmit={handleSubmit} className='login-form'>
       <h2>Profile Information</h2>
       <div>
-        <label htmlFor='name'>School ID</label>
+        <label htmlFor='name'>Full Name </label>
           <input
             type="text"
             id='name'
@@ -367,28 +388,30 @@ function CreateProfileForm({ onLogin, toggleProfileMode }) {
             value={schoolId}
             onChange={(e) => setSchoolId(e.target.value)}
           />
-          <label htmlFor='districtId'>School ID</label>
+          <label htmlFor='districtId'>  District ID</label>
           <input
             type="text"
             id='districtId'
             value={districtId}
             onChange={(e) => setDistrictId(e.target.value)}
           />
-          <label htmlFor='address'>School ID</label>
+          <label htmlFor='address'>Address</label>
           <input
             type="text"
             id='address'
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
-          <label htmlFor='phoneNumber'>School ID</label>
+          <label htmlFor='phoneNumber'>&nbsp; &nbsp; &nbsp; Phone #</label>
           <input
             type="text"
             id='phoneNumber'
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
           />
-          
+          <button type="submit" onClick={handleSubmit}>
+            Create Profile
+          </button>
       </div>
     </form>
   );
